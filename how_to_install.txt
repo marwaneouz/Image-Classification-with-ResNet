@@ -1,0 +1,292 @@
+=================================================================
+       GUIDE D'INSTALLATION - CLASSIFICATION D'IMAGES RESNET
+=================================================================
+
+📋 TABLE DES MATIÈRES
+1. Prérequis système
+2. Installation des dépendances
+3. Configuration de l'environnement
+4. Téléchargement des données
+5. Exécution des scripts
+6. Tests et vérification
+7. Dépannage courant
+8. Structure des fichiers
+
+=================================================================
+1. PRÉREQUIS SYSTÈME
+=================================================================
+
+✅ OBLIGATOIRE :
+- Python 3.8 ou supérieur
+- pip (gestionnaire de paquets Python)
+- 8 GB RAM minimum (16 GB recommandé)
+- 10 GB d'espace disque libre
+- Connexion Internet (pour télécharger les datasets)
+
+🚀 OPTIONNEL (FORTEMENT RECOMMANDÉ) :
+- GPU NVIDIA avec CUDA 11.7+
+- 4 GB VRAM minimum (8 GB+ pour modèles profonds)
+- cuDNN installé
+
+📝 VÉRIFICATION PYTHON :
+python --version    # Doit afficher Python 3.8+
+pip --version       # Vérifier que pip est installé
+
+=================================================================
+2. INSTALLATION DES DÉPENDANCES
+=================================================================
+
+ÉTAPE 1 : Cloner le repository
+-------------------------------
+git clone https://github.com/marwaneouz/Image-Classification-with-ResNet.git
+cd Image-Classification-with-ResNet
+
+ÉTAPE 2 : Créer un environnement virtuel
+----------------------------------------
+# Méthode 1 : avec venv (recommandé)
+python -m venv resnet_env
+
+# Activation (Linux/Mac)
+source resnet_env/bin/activate
+
+# Activation (Windows)
+resnet_env\Scripts\activate
+
+# Méthode 2 : avec conda (alternative)
+conda create -n resnet_env python=3.8
+conda activate resnet_env
+
+ÉTAPE 3 : Installer les dépendances
+-----------------------------------
+# Installation automatique depuis requirements.txt
+pip install -r requirements.txt
+
+# OU installation manuelle des packages principaux :
+pip install torch==2.1.0 torchvision==0.16.0 --index-url https://download.pytorch.org/whl/cu118
+pip install numpy==1.24.3 pandas==2.0.3 matplotlib==3.7.2
+pip install seaborn==0.12.2 scikit-learn==1.3.0 tqdm==4.65.0
+pip install opencv-python==4.8.0 thop==0.1.1 jupyter==1.0.0
+
+ÉTAPE 4 : Vérifier l'installation PyTorch
+------------------------------------------
+python -c "import torch; print(f'PyTorch: {torch.__version__}')"
+python -c "import torch; print(f'CUDA disponible: {torch.cuda.is_available()}')"
+
+=================================================================
+3. CONFIGURATION DE L'ENVIRONNEMENT
+=================================================================
+
+ÉTAPE 1 : Créer la structure des dossiers
+------------------------------------------
+mkdir -p data/cifar10 data/fashion_mnist data/custom
+mkdir -p results/models results/logs results/figures
+mkdir -p configs
+
+ÉTAPE 2 : Variables d'environnement (optionnel)
+-----------------------------------------------
+# Créer un fichier .env dans le dossier racine
+echo "CUDA_VISIBLE_DEVICES=0" > .env
+echo "OMP_NUM_THREADS=4" >> .env
+
+# Charger les variables (Linux/Mac)
+export $(cat .env | xargs)
+
+=================================================================
+4. TÉLÉCHARGEMENT DES DONNÉES
+=================================================================
+
+AUTOMATIQUE (recommandé) :
+--------------------------
+python scripts/download_datasets.py
+
+MANUEL :
+--------
+Les datasets CIFAR-10 et Fashion-MNIST se téléchargent automatiquement
+lors de la première exécution des scripts d'entraînement.
+
+Pour le dataset personnalisé :
+1. Créer les dossiers : data/custom/train/ et data/custom/test/
+2. Organiser vos images par classe dans ces dossiers
+3. Structure attendue :
+   data/custom/train/classe1/image1.jpg
+   data/custom/train/classe2/image2.jpg
+   ...
+
+=================================================================
+5. EXÉCUTION DES SCRIPTS
+=================================================================
+
+🎯 ENTRAÎNEMENT RAPIDE (test)
+-----------------------------
+# Test sur CIFAR-10 avec ResNet-18 (5 epochs)
+python src/training/train.py --dataset cifar10 --model resnet18 --epochs 5 --batch_size 32
+
+🏋️ ENTRAÎNEMENT COMPLET
+------------------------
+# CIFAR-10 avec configuration optimale
+python src/training/train.py --dataset cifar10 --model resnet18 --epochs 200 --batch_size 128 --lr 0.01
+
+# Fashion-MNIST
+python src/training/train.py --dataset fashion_mnist --model resnet18 --epochs 100 --batch_size 128
+
+# Dataset personnalisé
+python src/training/train.py --dataset custom --model resnet18 --epochs 50 --batch_size 64 --data_path data/custom
+
+🔬 ÉVALUATION
+-------------
+# Évaluer un modèle entraîné
+python src/evaluation/evaluate.py --model_path results/models/resnet18_cifar10.pth --dataset cifar10
+
+# Génération des matrices de confusion et métriques
+python src/evaluation/evaluate.py --model_path results/models/resnet18_cifar10.pth --dataset cifar10 --save_plots
+
+📊 DÉMONSTRATION INTERACTIVE
+-----------------------------
+# Lancer Jupyter Notebook
+jupyter notebook notebooks/demo.ipynb
+
+# Alternative : Jupyter Lab
+jupyter lab notebooks/demo.ipynb
+
+=================================================================
+6. TESTS ET VÉRIFICATION
+=================================================================
+
+TESTS UNITAIRES :
+-----------------
+# Exécuter tous les tests
+python -m pytest tests/ -v
+
+# Test spécifique
+python -m pytest tests/test_models.py -v
+
+VÉRIFICATION MANUELLE :
+-----------------------
+# Test d'import des modules
+python -c "from src.models.resnet import ResNet18; print('Import réussi !')"
+
+# Test de création de modèle
+python -c "from src.models.resnet import ResNet18; model = ResNet18(10); print(f'Modèle créé avec {sum(p.numel() for p in model.parameters())} paramètres')"
+
+# Test de chargement des données
+python -c "import torchvision; dataset = torchvision.datasets.CIFAR10(root='data', download=True); print(f'CIFAR-10 téléchargé : {len(dataset)} images')"
+
+=================================================================
+7. DÉPANNAGE COURANT
+=================================================================
+
+❌ ERREUR : "No module named 'src'"
+SOLUTION : Exécuter depuis le dossier racine du projet
+cd Image-Classification-with-ResNet
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
+❌ ERREUR : "CUDA out of memory"
+SOLUTIONS :
+- Réduire la batch_size : --batch_size 32 ou 16
+- Utiliser le CPU : --device cpu
+- Fermer autres applications gourmandes
+
+❌ ERREUR : "RuntimeError: DataLoader worker ... is killed by signal"
+SOLUTION : Réduire num_workers
+python src/training/train.py --num_workers 2
+
+❌ ERREUR : "Permission denied" (Linux/Mac)
+SOLUTION : 
+chmod +x scripts/*.py
+sudo pip install -r requirements.txt
+
+❌ ERREUR : "SSL Certificate error" lors du téléchargement
+SOLUTIONS :
+pip install --trusted-host pypi.org --trusted-host pypi.python.org -r requirements.txt
+# OU
+pip install --upgrade certifi
+
+❌ ERREUR : Modèle trop lent sur CPU
+SOLUTIONS :
+- Utiliser ResNet-18 au lieu de ResNet-50
+- Réduire la taille des images
+- Utiliser moins d'epochs pour tester
+
+=================================================================
+8. STRUCTURE DES FICHIERS
+=================================================================
+
+Image-Classification-with-ResNet/
+├── src/                          # Code source principal
+│   ├── models/
+│   │   ├── resnet.py            # Architecture ResNet
+│   │   └── blocks.py            # Blocs résiduels
+│   ├── data/
+│   │   ├── datasets.py          # Chargement des données
+│   │   └── transforms.py        # Transformations
+│   ├── training/
+│   │   ├── train.py             # Script d'entraînement
+│   │   └── utils.py             # Fonctions utilitaires
+│   └── evaluation/
+│       ├── evaluate.py          # Évaluation des modèles
+│       └── metrics.py           # Calcul des métriques
+├── notebooks/
+│   └── demo.ipynb               # Démonstration interactive
+├── configs/                     # Fichiers de configuration
+├── scripts/                     # Scripts utilitaires
+├── results/                     # Résultats et modèles
+├── data/                        # Datasets
+└── docs/                        # Documentation
+
+=================================================================
+9. COMMANDES UTILES
+=================================================================
+
+# Vérifier l'utilisation GPU
+nvidia-smi
+
+# Monitorer l'entraînement en temps réel
+tail -f results/logs/training.log
+
+# Lister les modèles sauvegardés
+ls -la results/models/
+
+# Vérifier la taille des datasets
+du -sh data/
+
+# Nettoyer le cache
+rm -rf __pycache__/
+rm -rf src/__pycache__/
+rm -rf src/*/__pycache__/
+
+=================================================================
+10. RESSOURCES ET SUPPORT
+=================================================================
+
+📚 DOCUMENTATION :
+- Rapport complet : docs/Final_Rapport_ResNet.pdf
+- Paper ResNet original : https://arxiv.org/abs/1512.03385
+- Documentation PyTorch : https://pytorch.org/docs/
+
+🔗 LIENS UTILES :
+- Repository GitHub : https://github.com/marwaneouz/Image-Classification-with-ResNet
+- Issues GitHub : https://github.com/marwaneouz/Image-Classification-with-ResNet/issues
+
+📧 CONTACT :
+- Marwane Ouzaina : marwaneouzaina@example.com
+ 
+
+=================================================================
+11. LISTE DE CONTRÔLE D'INSTALLATION
+=================================================================
+
+□ Python 3.8+ installé et vérifié
+□ Repository cloné
+□ Environnement virtuel créé et activé
+□ Dépendances installées depuis requirements.txt
+□ PyTorch fonctionne (avec ou sans CUDA)
+□ Structure des dossiers créée
+□ Test d'import réussi
+□ Premier entraînement test lancé
+□ Notebook de démonstration accessible
+
+Si tous les éléments sont cochés, l'installation est complète !
+
+=================================================================
+FIN DU GUIDE D'INSTALLATION
+=================================================================
