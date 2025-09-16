@@ -244,8 +244,8 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 ## 📧 Contact
 
 Pour toute question ou suggestion :
-- Email : marwane.ouzaina@example.com
-- LinkedIn : [Marwane Ouzaina](https://linkedin.com/in/marwane-ouzaina)
+- Email : marwaneouzaina@gmail.com
+- LinkedIn : [Marwane Ouzaina](www.linkedin.com/in/marwane-ouzaina-a46200322)
 
 ---
 
