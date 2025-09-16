@@ -125,7 +125,7 @@ jupyter notebook notebooks/demo.ipynb
 ### Visualisations
 
 #### Courbes d'apprentissage
-![Training Curves](results/figures/training_curves_cifar10.png)
+![Training Curves](results/figures/training_curves_cifar10.jpg)
 
 #### Matrice de confusion
 ![Confusion Matrix](results/figures/confusion_matrix_cifar10.png)
