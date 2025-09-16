@@ -214,11 +214,11 @@ Les contributions sont les bienvenues ! Veuillez :
 
 ```
 Image-Classification-with-ResNet/
-├── src/                    # Code source
+├── ResNet/                    # Code source
 ├── notebooks/              # Jupyter notebooks
 ├── configs/               # Configurations
-├── results/               # Résultats et modèles
-├── docs/                  # Documentation
+├── resultat/               # Résultats et modèles
+├── Rapport/                  # Documentation
 └── tests/                 # Tests unitaires
 ```
 
